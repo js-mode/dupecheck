@@ -1,6 +1,5 @@
 #!/usr/local/bin/python3
 
-import os
 import sys
 
 from utils import db
@@ -13,14 +12,12 @@ from config import DB_FILE
 
 
 def usage(command_name):
-	print("\nYou must pass a first parameter, which points to the filesystem you want to examine")
-	print("for potential duplicates files.\n\n")
-	print(f"{command_name} [directory] [cutoff size]")
+	print(f"\n{command_name} directory [cutoff size]")
 	print("\nArguments:")
 	print("directory - required - the directory to walk down through and look for duplicate files.")
 	print("cutoff size - optional - the total space of any potential duplicates that falls below")
-	print("                         this threshold, in bytes, will not be displayed.")
-	print("                         This number is in KB (base 10). i.e. 1 means 1,000 bytes.\n")
+	print("                         this threshold, in KB (kilobytes), will not be displayed.")
+	print("                         This number is in base 10. i.e. 1 means 1,000 bytes.\n")
 	print("Examples:\n")
 	print(f"{command_name} /my/file/system\n")
 	print("\tWill tree walk through filesystem /my/file/system and examine all files")

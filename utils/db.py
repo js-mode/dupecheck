@@ -8,7 +8,6 @@ class FileDatabase:
 	def __init__(self, filename):
 		self.connection = sqlite3.connect(filename)
 		self.cursor = self.connection.cursor()
-		self.cleanup()
 		
 	def cleanup(self):
 		self.cursor.execute('''DROP TABLE IF EXISTS files''')
@@ -40,7 +39,12 @@ class FileDatabase:
 		
 	def find_files_of_name(self, name):
 		val = (name,)
-		self.cursor.execute('''SELECT filedir, filename, sum(filesize) AS totsize FROM files WHERE filename=?''', val)
+		self.cursor.execute('''SELECT filedir, filename FROM files WHERE filename=?''', val)
+		return self.cursor.fetchall()
+		
+	def find_specific_file(self, directory, name):
+		val = (directory, name)
+		self.cursor.execute('''SELECT filedir, filename FROM files WHERE filedir=? and filename=?''', val)
 		return self.cursor.fetchall()
 		
 	def __del__(self):

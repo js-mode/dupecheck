@@ -8,6 +8,7 @@ from config import DOT_PRINT, DIR_PATH_SEPARATOR
 
 def build_db(file_db, directory, entertain=False):
 	count = 0
+	file_db.cleanup()
 
 	for dirName, subdirList, fileList in os.walk(directory):
 		for fname in fileList:
