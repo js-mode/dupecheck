@@ -8,7 +8,6 @@ class FileDatabase:
 	def __init__(self, filename):
 		self.connection = sqlite3.connect(filename)
 		self.cursor = self.connection.cursor()
-		self.cleanup()
 		
 	def cleanup(self):
 		self.cursor.execute('''DROP TABLE IF EXISTS files''')
