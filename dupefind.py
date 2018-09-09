@@ -5,10 +5,11 @@ import sys
 
 from utils import db
 
+import utils.functions
+
 
 # CONSTANTS
-DOT_PRINT = 1000
-DIR_PATH_SEPARATOR = '/'
+from config import DB_FILE
 
 
 def usage(command_name):
@@ -47,59 +48,13 @@ def main():
 	else:
 		cutoff = None
 	
-	file_db = db.FileDatabase("./filebase.db")
-
+	file_db = db.FileDatabase(DB_FILE)
 	rootDir = sys.argv[1]
-	count = 0
-	for dirName, subdirList, fileList in os.walk(rootDir):
-		for fname in fileList:
-			# skip the garbage Mac general one
-			# note this does not address the metadata files - .<filename> will still be picked up
-			if fname == ".DS_Store":
-				continue
-			
-			#insert file into database
-			fullFileName = f"{dirName}{DIR_PATH_SEPARATOR}{fname}"
-			statinfo = os.stat(fullFileName)
-			fileSize = statinfo.st_size
-			
-			file_db.insert(dirName, fname, fileSize)
-			
-			count += 1
-			
-			if count % DOT_PRINT == 0:
-				print('.', end='', flush=True)
 	
+	count = utils.functions.build_db(file_db, rootDir, entertain=True)	
 	print(f"\n{count} files inserted into the database\n")
 	
-	print("\nPossible matches by file size:\n")
+	utils.functions.print_matches(file_db, cutoff)
 	
-	result = file_db.find_dup_filesizes()	
-	
-	for match in result:
-		if cutoff:
-			if match[4] < cutoff:
-				break
-		print(f"\tmatches: {match[3]}  file size: {match[2]}  total size: {match[4]:,}")
-
-		files = file_db.find_files_of_size(match[2])
-		for file in files:
-			print(f"\t|\t{file[0]}{DIR_PATH_SEPARATOR}{file[1]}")
-		print("")
-
-
-	print("\nPossible matches by file name:\n")
-		
-	result = file_db.find_dup_filenames()
-	for match in result:
-		if cutoff:
-			if match[3] < cutoff:
-				break
-		print(f"\tmatches: {match[2]}  file name: {match[1]}")
-		files = file_db.find_files_of_name(match[1])
-		for file in files:
-			print(f"\t|\t{file[0]}{DIR_PATH_SEPARATOR}{file[1]}")
-		print("")
-		
 
 main()

@@ -1,7 +1,6 @@
+#!/usr/local/bin/python3
+
 import sqlite3
-
-
-connection = None
 
 
 class FileDatabase:
@@ -23,7 +22,6 @@ class FileDatabase:
 		self.cursor.execute('''CREATE INDEX filesize on files(filesize)''')
 	
 	def insert(self, filedir, filename, filesize):
-		#vals = f"('{filename}', {filesize})"
 		vals = (f"{filedir}", f"{filename}", filesize)
 		self.cursor.execute('''INSERT INTO files VALUES (?, ?, ?)''', vals)
 		
@@ -44,5 +42,9 @@ class FileDatabase:
 		val = (name,)
 		self.cursor.execute('''SELECT filedir, filename, sum(filesize) AS totsize FROM files WHERE filename=?''', val)
 		return self.cursor.fetchall()
+		
+	def __del__(self):
+		self.connection.commit()
+		self.connection.close()
 		
 		
