@@ -42,6 +42,11 @@ class FileDatabase:
 		self.cursor.execute('''SELECT filedir, filename FROM files WHERE filename=?''', val)
 		return self.cursor.fetchall()
 		
+	def find_specific_file(self, directory, name):
+		val = (directory, name)
+		self.cursor.execute('''SELECT filedir, filename FROM files WHERE filedir=? and filename=?''', val)
+		return self.cursor.fetchall()
+		
 	def __del__(self):
 		self.connection.commit()
 		self.connection.close()

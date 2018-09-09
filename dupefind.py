@@ -12,9 +12,7 @@ from config import DB_FILE
 
 
 def usage(command_name):
-	print("\nYou must pass a first parameter, which points to the filesystem you want to examine")
-	print("for potential duplicates files.\n\n")
-	print(f"{command_name} [directory] [cutoff size]")
+	print(f"\n{command_name} directory [cutoff size]")
 	print("\nArguments:")
 	print("directory - required - the directory to walk down through and look for duplicate files.")
 	print("cutoff size - optional - the total space of any potential duplicates that falls below")
