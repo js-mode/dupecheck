@@ -3,6 +3,7 @@
 import sys
 
 from utils import db
+from config import DIR_PATH_SEPARATOR
 
 import utils.functions
 
@@ -46,7 +47,7 @@ def main():
 		cutoff = None
 	
 	file_db = db.FileDatabase(DB_FILE)
-	rootDir = sys.argv[1]
+	rootDir = sys.argv[1].rstrip(DIR_PATH_SEPARATOR)
 	
 	count = utils.functions.build_db(file_db, rootDir, entertain=True)	
 	print(f"\n{count} files inserted into the database\n")

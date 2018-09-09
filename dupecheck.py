@@ -45,7 +45,7 @@ def main():
 		sys.exit(1)
 	
 	db_filename = sys.argv[1]
-	dir_to_walk = sys.argv[2]
+	dir_to_walk = sys.argv[2].rstrip(DIR_PATH_SEPARATOR)
 		
 	if len(sys.argv) >= 4:
 		option = sys.argv[3].lower()
