@@ -1,5 +1,6 @@
 #!/bin/sh
 
-export PYTHONPATH="/Users/kevinharlan/Documents/Development/dupefind"
+# set this path to point at the root of the source code
+export PYTHONPATH=""
 
 
