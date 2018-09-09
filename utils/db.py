@@ -39,7 +39,7 @@ class FileDatabase:
 		
 	def find_files_of_name(self, name):
 		val = (name,)
-		self.cursor.execute('''SELECT filedir, filename, sum(filesize) AS totsize FROM files WHERE filename=?''', val)
+		self.cursor.execute('''SELECT filedir, filename FROM files WHERE filename=?''', val)
 		return self.cursor.fetchall()
 		
 	def __del__(self):
