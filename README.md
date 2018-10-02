@@ -12,7 +12,7 @@ makes two separate comparisons, first by file size matches, and then a second pa
 matches (using only the file name, excluding the directory path portion). Each pass is an "OR"
 operation. Each pass outputs the potential candidates separately.
 
-The routine uses a database to build and store the fileysstem information used in the comparisons.
+The routine uses a database to build and store the filesystem information used in the comparisons.
 Then queries are run with specific criteria to help determine potential matches.
 
 At the end, the routine will output all match candidates to stdout. The user can redirect the
@@ -25,12 +25,12 @@ Today that is './filebase.db".
 
 dupecheck:
 ==========
-This routine will run through a given directory structure, and alert the user (via output) to any
+This routine will run through a given directory structure and alert the user (via output) to any
 possible duplicate files in that directory structure, compared to an existing files database of some
 other directory structure.
 
 It can also be invoked to add the current directory structure files into the specified files
-database. In that invocation, no duplicate checks are performed. The files are strictly added, but
+database. In that invocation, no duplicate checks are performed. The files are only added, but
 only if the directory name and file name are not already in the database (i.e. no duplicate
 inserts are performed).
 
