@@ -6,56 +6,76 @@ import sys
 from utils import db
 
 import utils.functions
+from commands import create, check, update
 
+COMMANDS = {
+	'create': create,
+	'check': check,
+	'update': update
+}
 
-# CONSTANTS
-from config import DIR_PATH_SEPARATOR
-
+def resolve_command(cmd):
+	try:
+		return COMMANDS[cmd]
+	except KeyError:
+		return None
 
 def usage(command_name):
-	print("\nRequired arguments missing.\n")
-	print(f"{command_name} database_file directory_to_check [add]")
+	print(f"{command_name}  command  database_file  directory_to_check")
 	print("\nArguments:")
+	print("command						 - Tells the utility what operation to perform with regard")
+	print("								 - to the database. See commands list below.")
 	print("database_file - required      - the path and filename of the files database to use for")
 	print("                                comparison against.")
-	print("directory_to_check - required - the directory to walk, and compare files for possible")
-	print("                                duplicate matches in the database.")
-	print("add - optional                - string literal 'add'. If supplied, the files found in")
-	print("                                the directory will have their info added to the")
-	print("                                specified database file.")
-	print("Examples:\n")
-	print(f"{command_name} /my/files.db /my/file/system\n")
+	print("directory_to_check - required - the directory to walk, and perform the specified command against.")
+	print("\nCommands:")
+	print("create - Create the database (i.e. it does not already exist). If the database file does")
+	print("			already exist, then the process will abort with an error. Otherwise, the database")
+	print("			file will be created and processing will proceed as if an update command had given")
+	print("			on an existing database file.")
+	print("check  - Check the specified directory for duplicate entries in the file database, and")
+	print("			display any potential matches for review.")
+	print("update - Will modify the database entries for this directory to match the directory")
+	print("			specified. NOTE that this will mean adding new files, updating stats on existing")
+	print("			existing files, and removal of files in the database that are not in the filesystem.")
+	print("\nExamples:")
+	print(f"\n{command_name} create /files.db /file/system\n")
+	print("\tWill create the database files.db (or will abort with an error if that database file")
+	print("\talready exists). Then will perform like an update command, which means populating the")
+	print('\tdatabase files.db with the information in the /file/system filesystem tree.')
+	print(f"\n{command_name} check /my/files.db /my/file/system\n")
 	print("\tWill use the /my/files.db database file, and will tree walk through filesystem")
-	print("\t/my/file/system and examine all files (from that path and lower)")
+	print("\t/my/file/system and examine all files (from that path and lower). It will output")
+	print("\tany potential duplicates found, where the total impact is greater than 1 MB (1000 KB)")
 	print("")
-	print(f"{command_name} /some/files.db /another/filesystem add")
+	print(f"\n{command_name} update /some/files.db /another/filesystem")
 	print("\tWill use database file /some/files.db, will tree walk through the filesystem")
-	print("\t/another/filesystem, and will add the files it finds into the database /some/files.db")
-	print("\tIt will not perform file match checking, as you have specified it to add the files.")
-	print("\n\tThe add option would typically be done after a first run without that option, and")
-	print("\tany duplicates eliminated. Then a second run with add will update the database with")
-	print("\tthe new info, for future comparison runs.\n")
+	print("\t/another/filesystem. The database will have new entries created for files not already")
+	print('\tfound in the database, will have existing files updated, and will have missing files')
+	print("\tremoved. When complete, the database information on the specified directly will")
+	print("\texactly reflect the current contents and state of that directory.")
 	return
 
 
 def main():
 
-	if len(sys.argv) < 3:
+	if len(sys.argv) < 4:
 		usage(sys.argv[0])
 		sys.exit(1)
 	
-	db_filename = sys.argv[1]
-	dir_to_walk = sys.argv[2].rstrip(DIR_PATH_SEPARATOR)
-		
-	if len(sys.argv) >= 4:
-		option = sys.argv[3].lower()
-		if option != "add":
-			print(f"\nUnsupported option: {option}\n")
-			usage(sys.argv[0])
-			sys.exit(2)
-	else:
-		option = None
+	command = sys.argv[1]
+	parameters = sys.argv[2:]
+
+	command_handler = resolve_command(command)
+	if command_handler is None:
+		print(f"\nInvalid command: '{command}'\n")
+		usage(sys.argv[0])
+		sys.exit(2)
 	
+	command_handler(parameters)
+
+	sys.exit(0)
+
 	file_db = db.FileDatabase(db_filename)
 	tot_matches = 0
 	tot_adds = 0

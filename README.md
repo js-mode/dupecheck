@@ -1,54 +1,42 @@
-# dupefind
-Duplicate File finder - test project
+# dupecheck
+Duplicate File checker - test project
 
-There are now two routines included in this project. Running a routine without passing it any
-commandline parameters will bring up a help screen describing parameters and usage.
+## Description
+This project has been refactored back down to a single command, dupecheck. This utility is the general purpose routine for creating an initial file database, updating that database (adding new file data, updating existing data, and/or deleting data), and running checks on the contents of a specified directory tree to see if there are any possible duplicates in the existing database.
 
+There is now a command-line argument which specifies what action to take. These are:
 
-dupefind:
-=========
-This routine will do a treewalk on a specified path, and look for potential duplicate files. It
-makes two separate comparisons, first by file size matches, and then a second pass using file name
-matches (using only the file name, excluding the directory path portion). Each pass is an "OR"
-operation. Each pass outputs the potential candidates separately.
+create - Create a new file info database, and seed it with initial data from the supplied directory tree. If the file already exists, the process will abort with an error. Otherwise, the file will be created as a file info database (a SQLLite database).
 
-The routine uses a database to build and store the filesystem information used in the comparisons.
-Then queries are run with specific criteria to help determine potential matches.
+check - using an existing file info database, compare the contents of the specified directory tree and display any possible matches (by file size and by file name). Will also indicate if no matches are found.
 
-At the end, the routine will output all match candidates to stdout. The user can redirect the
-output to a file, and then use that as a list for additional comparison.
+update - will update the specified file info database information that pertains to the specified directory tree to exactly reflect what the current state is. This means new files will be added, existing files will be checked and have their file size updated, and deleted files will be removed from the database.
 
-The database is left behind for future use by other utilities, such as dupecheck. The database file
-is output to a predefined file path and location, which is specified in config.py as DB_FILE.
-Today that is './filebase.db".
+If no command line arguments are passed, the utility will respond with a help screen.
 
+## Usage
+The command line arguments are:
 
-dupecheck:
-==========
-This routine will run through a given directory structure and alert the user (via output) to any
-possible duplicate files in that directory structure, compared to an existing files database of some
-other directory structure.
+```dupecheck.py  command  database_file  directory_tree```
 
-It can also be invoked to add the current directory structure files into the specified files
-database. In that invocation, no duplicate checks are performed. The files are only added, but
-only if the directory name and file name are not already in the database (i.e. no duplicate
-inserts are performed).
+### Examples:
 
-The add mode is intended more as a second pass. First pass would be to run this utility to find and
-validate/weed out any duplicates, and then do a second run to update the files database with the
-new information.
+```dupecheck.py  create  /files.db  /file/system```
 
-Note that the utility will filter out the treewalk path from the match results. This allows the
-utility to be run, or re-run, on a directory that is already in the files database structure. 
+If /files.db exists, will exit with an error. Otherwise, will create /files.db as a database file, and will populate it with information from the tree /file/system
 
+```dupecheck.py  check  /my/files.db  /my/file/system```
 
-REQUIREMENTS:
+Will walk the tree /my/file/system and compare the contents to information in the file info database /my/files.db. Any possible matches by file size or file name will be called out, or else the fact no matches were found will be displayed.
 
-These routines were written in, and intended for, Python 3. There are some functions and formats
-that will not work in prior versions of Python.
+```dupecheck.py  update  /some/files.db  /another/filesystem```
 
-The current (first) version requires no external libraries. Only internal libraries were used,
-including SQLlite.
+Will update the file info database /some/files.db information to reflect the current state of directory tree /another/filesystem. Any info not in the database will be added, any existing info will be compared and udpated if necessary, and anything in the database that is not in the filesystem will be removed from the database.
 
-The requirements.txt file was generated from a pip freeze command, just to be sure. The empty
-requirements file is not an error or oversight.
+## Requirements:
+
+These routines were written in, and intended for, Python version 3.6.3 or higher. There are some functions and formats that will not work in prior versions of Python.
+
+The current implementation requires no external libraries. Only internal libraries were used, including SQLlite.
+
+The requirements.txt file was generated from a pip freeze command, just to be sure. The empty requirements file is not an error or oversight.
