@@ -7,11 +7,12 @@ from utils import db
 
 import utils.functions
 from utils.help import usage
-from commands import create, check, update
+from commands import create, check, report, update
 
 COMMANDS = {
 	'create': create,
 	'check': check,
+	'report': report,
 	'update': update
 }
 

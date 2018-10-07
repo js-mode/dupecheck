@@ -1,8 +1,8 @@
 import os
 
 from utils import db
-from utils.functions import treewalk_with_action, is_file, is_dir, normalize_dir_name
-from utils.help import usage, help_create, help_check, help_update
+from utils.functions import treewalk_with_action, is_file, is_dir, normalize_dir_name, print_matches
+from utils.help import usage, help_create, help_check, help_update, help_report
 
 
 class CommandException(Exception):
@@ -12,12 +12,14 @@ class CommandException(Exception):
     """
     pass
 
+
 def validate_general_params(parameters):
     """
     Validate the database file is a file, and the tree to walk is a directory
     This is a common use case for several commands, so centralizing validate into one routine
     Will raise an CommandException if there is an error
-    :param parameters: the database filename/path
+    :param parameters: the parameters passed in to validate. The general case is
+    :                : first param is database file, and second param is the dir tree to walk
     :return first param: True if both are valid, otherwise raises a CommandException
     """
     dbfile = parameters[0]
@@ -34,8 +36,9 @@ def validate_general_params(parameters):
 def create(parameters):
     """
     Create the database file, and then execute an update on it
-    :param dbfilename: the filename, possibly including path, to the database file to create
-    :     dir_to_walk: the directory tree to walk, and update into the database
+    :param parameters: a list of the parameters passed in to this command from the command line.
+    :                : the utiility (argv[0]) and the command itself (argv[1]) have already been
+    :                : sripped, leaving only the parameters for the command itself.
     :return: nothing
     """
     if len(parameters) != 2:
@@ -63,8 +66,9 @@ def create(parameters):
 def check(parameters):
     """
     Check a directory against the database, looking for possible duplicates
-    :param dbfilename: the filename, possibly including path, to the database file to create
-    :     dir_to_walk: the directory tree to walk, to look for matches in the database
+    :param parameters: a list of the parameters passed in to this command from the command line.
+    :                : the utiility (argv[0]) and the command itself (argv[1]) have already been
+    :                : sripped, leaving only the parameters for the command itself.
     :return: nothing    
     """
 
@@ -156,8 +160,9 @@ def update(parameters):
     """
     Update the file database with the info from the filesystem tree. This means adding missing
     file data, updating existing file data, and removing missing files from the database.
-    :param dbfilename: the filename, possibly including path, to the database file to create
-    :     dir_to_walk: the directory tree to walk, and update into the database
+    :param parameters: a list of the parameters passed in to this command from the command line.
+    :                : the utiility (argv[0]) and the command itself (argv[1]) have already been
+    :                : sripped, leaving only the parameters for the command itself.
     :return: nothing   
     """
 
@@ -248,3 +253,34 @@ def update_helper(file_db, dir, fname, filesize, state):
     state['updated'] = state.get('updated',0) + 1
     print(f"Updated: {full_fname}  old size = {file_db_size} new size = {filesize}")
     return
+
+
+def report(parameters):
+    """
+    Generate a report on possible duplicates inside the existing database.
+    :param parameters: a list of the parameters passed in to this command from the command line.
+    :                : the utiility (argv[0]) and the command itself (argv[1]) have already been
+    :                : sripped, leaving only the parameters for the command itself.
+    :return: nothing   
+    """
+    if len(parameters) == 0:
+        help_report()
+        return
+    if len(parameters) > 1:
+        try:
+            min_size = int(parameters[1])
+            min_size *= 1000
+        except ValueError as err:
+            print(f"Error: minimum size parameter: {err}")
+            return
+    else:
+        min_size = None
+    
+    dbfilename = parameters[0]
+    if not is_file(dbfilename):
+        print(f"\nError: file {dbfilename} is not a file, does not exist, or is not accessible.\n")
+        return
+    
+    file_db = db.FileDatabase(dbfilename)
+
+    print_matches(file_db, min_size)
