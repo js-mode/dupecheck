@@ -3,6 +3,35 @@
 import os
 
 
+def is_file(filename):
+    """
+    Checks to see if the filename passed in is a file or not
+    :param filename: filename to check
+    :return: True if it is a file, otherwise false
+    """
+    return os.path.isfile(filename)
+
+
+def is_dir(dirname):
+    """
+    Checks to see if the directory name/path passed in is a directory or not
+    :param dirname: directory name/path to check
+    :return: True if it is a file, otherwise false
+    """
+    return os.path.isdir(dirname)
+
+
+def normalize_dir_name(dirname):
+	"""
+	Function to normalize a directory name. Make sure there is no trailing os separator, and
+	convert it to an absolute path
+	:param dirname: the directory name to normalize
+	:return: the normalized directory name - full absolute path, with no trailing OS separator
+	"""
+	temp = dirname.rstrip(os.sep)
+	return os.path.abspath(temp)
+
+
 def treewalk_with_action(file_db, directory, filter, worker, in_state = None):
 	"""
 	Perform a treewalk on a specified filesystem, including all subdirectories and files. Will skip
