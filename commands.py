@@ -73,7 +73,7 @@ def check(parameters):
         return
 
     try:
-        status = validate_general_params(parameters)
+        validate_general_params(parameters)
     except CommandException as err:
         print(f"\nError: {err}\n")
         return
@@ -94,9 +94,9 @@ def check(parameters):
         print("\nNo duplicates found.\n")
         return
     
-    tot_matches = state['tot_matches']
-    tot_size_matches = state['tot_size_matches']
-    tot_name_matches = state['tot_name_matches']
+    tot_matches = return_state['tot_matches']
+    tot_size_matches = return_state['tot_size_matches']
+    tot_name_matches = return_state['tot_name_matches']
     print(f"\nTotal possible matches found: {tot_matches:,}")
     print(f"Size matches: {tot_size_matches:,}")
     print(f"Name matches: {tot_name_matches:,}\n")
@@ -165,7 +165,7 @@ def update(parameters):
         help_update()
         return
     try:
-        status = validate_general_params(parameters)
+        validate_general_params(parameters)
     except CommandException as err:
         print(f"\nError: {err}\n")
         return 
