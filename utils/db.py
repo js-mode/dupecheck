@@ -53,7 +53,7 @@ class FileDatabase:
 		return self.cursor.fetchall()
 
 	def find_files_below_dir(self, dir):
-		pattern=f"{dir}{os.sep}"
+		pattern=f"{dir}{os.sep}%"
 		val = (pattern,)
 		self.cursor.execute('''SELECT * FROM files WHERE filedir LIKE ?''', val)
 		return self.cursor.fetchall()

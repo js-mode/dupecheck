@@ -226,6 +226,7 @@ def delete_missing_files(file_db, dir_to_walk, state):
 
     # then walk through any and all sub directories under the given path
     files_in_db = file_db.find_files_below_dir(dir_to_walk)
+
     for file in files_in_db:
         file_dir = file[0]
         file_name = file[1]
