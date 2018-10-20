@@ -3,7 +3,7 @@ import sys
 command_name = sys.argv[0]
 
 def usage():
-    print(f"\n\n{command_name} v 1.3.2")
+    print(f"\n\n{command_name} v 1.3.3")
     print(f"\n{command_name}  command  (additional parameters)")
     print("\nCommands:")
     print("\ncreate - Create the database (i.e. it does not already exist). If the database file does")
