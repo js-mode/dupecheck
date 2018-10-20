@@ -1,5 +1,6 @@
 #!/usr/local/bin/python3
 
+import os
 import sqlite3
 
 
@@ -49,6 +50,12 @@ class FileDatabase:
 	def find_files_in_dir(self, dir):
 		val = (dir,)
 		self.cursor.execute('''SELECT * FROM files WHERE filedir=?''', val)
+		return self.cursor.fetchall()
+
+	def find_files_below_dir(self, dir):
+		pattern=f"{dir}{os.sep}%"
+		val = (pattern,)
+		self.cursor.execute('''SELECT * FROM files WHERE filedir LIKE ?''', val)
 		return self.cursor.fetchall()
 		
 	def find_specific_file(self, directory, name):

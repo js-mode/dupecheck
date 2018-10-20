@@ -178,11 +178,16 @@ def update(parameters):
     dbfilename = parameters[0]
     dir_to_walk = normalize_dir_name(parameters[1])
 
+    state = dict()
     file_db = db.FileDatabase(dbfilename)
 
-    # helper has to do all the work, as we can't rewalk paths in the database
-    # so it has to do adds, updates, and check for removals
-    return_state = treewalk_with_action(file_db, dir_to_walk, [".DS_Store"], update_helper)
+    # first, check existing data in the database
+    # remove any files that are in the database, but not in the filesystem
+    delete_missing_files(file_db, dir_to_walk, state)
+
+    # helper has to do all the individual file work
+    # so it has to do adds and updates
+    return_state = treewalk_with_action(file_db, dir_to_walk, [".DS_Store"], update_helper, in_state=state)
 
     total = return_state.get('total', 0)
     skipped = return_state.get('skipped',0)
@@ -195,6 +200,42 @@ def update(parameters):
     print(f"Added: {added:,}")
     print(f"Updated: {updated:,}")
     print(f"\nDeleted: {deleted:,}\n")
+
+
+def delete_missing_files(file_db, dir_to_walk, state):
+    """
+    This function will take a file database and a starting directory, and will walk through the files in
+    the database for that directory and all sub directories, and remove any files that no longer exist.
+    :param file_db: the file database to use as the source
+    :  dir_to_walk: the starting path, top level, to start checking if the files exist
+    :        state: a dictionary that can be used to store state info and return data
+    """
+
+    # first walk the files in the specified directory
+    # this is necessary due to the way the data is stored (without trailing os.sep)
+    files_in_db = file_db.find_files_in_dir(dir_to_walk)
+    for file in files_in_db:
+        file_dir = file[0]
+        file_name = file[1]
+        full_file = os.path.join(file_dir, file_name)
+        if not os.path.isfile(full_file):
+            # remove from database
+            file_db.delete(file_dir, file_name)
+            state['deleted'] = state.get('deleted',0) + 1
+            print(f"DELETED: {full_file}")
+
+    # then walk through any and all sub directories under the given path
+    files_in_db = file_db.find_files_below_dir(dir_to_walk)
+
+    for file in files_in_db:
+        file_dir = file[0]
+        file_name = file[1]
+        full_file = os.path.join(file_dir, file_name)
+        if not os.path.isfile(full_file):
+            # remove from database
+            file_db.delete(file_dir, file_name)
+            state['deleted'] = state.get('deleted',0) + 1
+            print(f"DELETED: {full_file}")
 
 
 def update_helper(file_db, dir, fname, filesize, state):
@@ -211,22 +252,6 @@ def update_helper(file_db, dir, fname, filesize, state):
     :return: Nothing. All results are either output via print, or stored in the state dictionary
     """
     state['total'] = state.get('total',0) + 1
-    # if this is our first time in this directory, check for removals
-    if dir not in state:
-        files_in_db = file_db.find_files_in_dir(dir)
-
-        # check each file, and if it no longer exists then remove it
-        for file in files_in_db:
-            file_dir = file[0]
-            file_name = file[1]
-            full_file = os.path.join(file_dir, file_name)
-            if not os.path.isfile(full_file):
-                # remove from database
-                file_db.delete(file_dir, file_name)
-                state['deleted'] = state.get('deleted',0) + 1
-                print(f"DELETED: {full_file}")
-        state[dir] = 1
-    
     full_fname = os.path.join(dir, fname)
 
     # add or update the file we are on right now
@@ -252,7 +277,6 @@ def update_helper(file_db, dir, fname, filesize, state):
     file_db.update(dir, fname, filesize)
     state['updated'] = state.get('updated',0) + 1
     print(f"Updated: {full_fname}  old size = {file_db_size} new size = {filesize}")
-    return
 
 
 def report(parameters):

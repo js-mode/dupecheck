@@ -1,9 +1,10 @@
 import sys
 
 command_name = sys.argv[0]
+version = "1.3.3"
 
 def usage():
-    print(f"\n\n{command_name} v 1.3.2")
+    print(f"\n\n{command_name} v {version}")
     print(f"\n{command_name}  command  (additional parameters)")
     print("\nCommands:")
     print("\ncreate - Create the database (i.e. it does not already exist). If the database file does")
@@ -23,6 +24,7 @@ def usage():
 
 
 def help_create():
+    print(f"\n\n{command_name} v {version}")
     print(f"\n{command_name}  create  database_file  directory_to_check\n")
     print("database_file - required      - the path and filename of the files database to create")
     print("                                and then populate with initial data.")
@@ -36,6 +38,7 @@ def help_create():
 
 
 def help_check():
+    print(f"\n\n{command_name} v {version}")
     print(f"\n{command_name}  check  database_file  directory_to_check\n")
     print("database_file - required      - the path and filename of the files database to use")
     print("                                as a reference for possible duplicates.")
@@ -50,6 +53,7 @@ def help_check():
 
 
 def help_update():
+    print(f"\n\n{command_name} v {version}")
     print(f"\n{command_name}  update  database_file  directory_to_check\n")
     print("database_file - required      - the path and filename of the files database to update")
     print("                                with the fileysstem info.")
@@ -65,6 +69,7 @@ def help_update():
     print("")
 
 def help_report():
+    print(f"\n\n{command_name} v {version}")
     print(f"\n{command_name}  report  database_file  [cutoff size KB]\n")
     print("database_file - required - the path and filename of the files database to search inside")
     print("                           and report on possible duplicates.")
